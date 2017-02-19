@@ -17,6 +17,8 @@ var dynamoTblDescribe = Promise.promisify(DynamoDb.describeTable, { context: Dyn
 var dynamoTblScan = Promise.promisify(DynamoDb.scan, { context: DynamoDb });
 var writeFile = Promise.promisify(require('fs').writeFile);
 
+var log = require('./log');
+
 program.version(pkg.version)
     .option('-t, --table [tableName]', 'Table to be exported to CSV format')
     .option('-d, --describe', 'Describe DynamoDb table')
@@ -27,7 +29,7 @@ program.version(pkg.version)
 Displays information about the specified table
 */
 var describeTable = function() {
-    console.log('Processing describe table request...');
+    log.info('Processing describe table request...');
 
     var params = {
         TableName: program.table
@@ -37,14 +39,14 @@ var describeTable = function() {
         .then(function _success(data) {
             if (data && data.Table) {
                 console.dir(data.Table);
-                console.log("Completed processing describe table request...\n\n");
+                log.info("Completed processing describe table request...\n\n");
             } else {
-                console.log("Failed to retrieve table description\n\n");
+                log.info("Failed to retrieve table description\n\n");
             }
         })
         .catch(function _error(error) {
-            console.dir(error);
-            console.log("Completed processing describe table request...\n\n");
+            log.error(error);
+            log.error("Completed processing describe table request...\n\n");
         });
 }
 
@@ -52,7 +54,7 @@ var describeTable = function() {
 Exports specified table date to specified file
 */
 var exportDynamoDbDataToCSV = function() {
-    console.log('\nProcessing export to CSV format request...');
+    log.info('\nProcessing export to CSV format request...');
 
     var query = {
         "TableName": program.table,
@@ -64,10 +66,10 @@ var exportDynamoDbDataToCSV = function() {
             return writeToFile(data);
         })
         .then(function _success() {
-            console.log("Completed processing table export to CSV format request...\n");
+            log.info("Completed processing table export to CSV format request...\n");
         })
         .catch(function _error(error) {
-            console.dir(error);
+            log.error(error);
         });
 }
 
@@ -84,7 +86,7 @@ var getItems = function(query, results) {
                     var unmarshalItems = data && data.Items && data.Items.map(unmarshalItem);
                     var items = (results || []).concat(unmarshalItems);
 
-                    console.log("Successfully processed " + items.length);
+                    log.info("Successfully processed " + items.length);
 
                     if (data.LastEvaluatedKey) {
                         query.ExclusiveStartKey = data.LastEvaluatedKey;
@@ -115,7 +117,7 @@ function writeToFile(results) {
 
 // Make sure the required options are specified
 if (!program.table) {
-    console.log('Please specify DynamoDb table');
+    log.info('Please specify DynamoDb table');
 
     program.outputHelp();
     process.exit(1);
@@ -127,7 +129,7 @@ if (program.describe) {
     describeTable();
 } else {
     if (!program.file) {
-        console.log('Please specify File to export the data to');
+        log.info('Please specify File to export the data to');
 
         program.outputHelp();
         process.exit(1);

@@ -28,6 +28,7 @@
     "commander": ">=2.2.0",
     "dynamodb-marshaler": "^2.0.0",
     "fast-csv": ">=2.1.0",
-    "json2csv": "^3.6.3"
+    "json2csv": "^3.6.3",
+    "winston": "^2.3.1"
   }
 }
