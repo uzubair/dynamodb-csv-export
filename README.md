@@ -20,6 +20,7 @@ node dynamodb-dump.js -d -t <table_name>
 ```
 
 > To *export* the contents, run the following command
+
 ```bash
 node dynamodb-dump.js -t <table_name> -f <filename>
 ```
